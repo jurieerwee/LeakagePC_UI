@@ -48,8 +48,8 @@ class Comms(object):
 			print('Socket is none!!')
 		else:
 			self.conn, adrr = self.socket.accept()
-			self.fdw = self.conn.makefile('wt') #writing filedescriptor
-			self.fdr = self.conn.makefile('rt') #reading file descriptor
+			self.fdw = self.conn.makefile('w') #writing filedescriptor
+			self.fdr = self.conn.makefile('r') #reading file descriptor
 		
 		return True
 		
@@ -71,7 +71,7 @@ class Comms(object):
 	
 	def receive(self):
 		#This method waits for 1 second to receive a msg and adds it to the queue if there is.  It is the caller's responsibility to implement a loop.  This allows for expansion of the method.
-		ready = select.select([self.fdr],[],[],1)
+		ready = select.select([self.fdr],[],[self.fdr,self.fdw],1)
 		if(len(ready[0])!=0):
 			data = self.fdr.readline().strip()
 			self.recvQ.put(data)
@@ -132,29 +132,36 @@ class UIServerComms(Comms):
 	
 	def receive(self):
 		silenceCounter = 0
-		while(self.terminate == False):
-			self.recvLock.acquire()
-			received = Comms.receive(self)
-			if(received == False):
-				silenceCounter +=1
-				if(silenceCounter>10):
-					self.terminateComms()
-			else:
-				silenceCounter = 0
-				try:
-					msgString = self.recvQ.get()
-					msg = json.loads(msgString)
-					key = next(iter(msg.keys()))
-					if(key == 'update'):
-						self.status = msg['update']
-					elif(key == 'appStatus'):
-						self.appStatus = msg['appStatus']
-					else:
-						self.incomingQ.put(msg)
-				except ValueError as e:
-					#Log invalid msg
-					print("Invalid msg",msgString)
-			self.recvLock.release()
+		while(self.terminate == False):			
+			try:
+				received = Comms.receive(self)
+
+				if(received == True):
+					
+					try:
+						msgString = self.recvQ.get()
+						if(not msgString):
+							silenceCounter+=1
+							if(silenceCounter>=10):
+								self.terminate = True
+						else:
+							silenceCounter = 0
+							msg = json.loads(msgString)
+							key = next(iter(msg.keys()))
+							if(key == 'update'):
+								self.status = msg['update']
+							elif(key == 'appStatus'):
+								self.appStatus = msg['appStatus']
+							else:
+								self.incomingQ.put(msg)
+								print("Msg in Q")
+					except ValueError as e:
+						#Log invalid msg
+						print("Invalid msg",msgString)
+			except select.error:
+				self.terminate = True
+				
+		print("Exeting receive thread")
 			
 	'''def popRecvMsg(self):
 		if(self.recvLock.acquire(blocking = False)==True):
@@ -187,7 +194,10 @@ class UIServerComms(Comms):
 		return self.rigID-1 #Return ID-1 since ID has already been incremented.
 	
 	def getIncoming(self):
-		return self.incomingQ.get_nowait()
+		if (self.incomingQ.empty() == False):
+			return self.incomingQ.get_nowait()
+		else:
+			return None
 	
 	def start(self):
 		self.startServer()
