@@ -193,6 +193,12 @@ class UIServerComms(Comms):
 
 		return self.rigID-1 #Return ID-1 since ID has already been incremented.
 	
+	def sendPromptReply(self,reply):
+		obj={}
+		obj['promptReply'] = reply
+		msg= json.dumps(obj) + '\n'
+		self.pushTransMsg(msg)
+	
 	def getIncoming(self):
 		if (self.incomingQ.empty() == False):
 			return self.incomingQ.get_nowait()

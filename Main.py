@@ -7,6 +7,7 @@ Created on 11 Dec 2015
 from tkinter import *
 from tkinter.tix import COLUMN
 from tkinter.ttk import Combobox
+import tkinter.messagebox
 import json
 import time
 import threading
@@ -40,7 +41,7 @@ class ButtonsFrame(Frame):
 		self.lblState = Label(text='State:')
 		self.lblState.grid(row=rowC,column = 2)
 		self.varState = StringVar()
-		self.lstStates = ["clearError","prime","fill","forceFill","idle","pump","setPressure","error","override","leakageTest","continue", "preempt"]
+		self.lstStates = ["clearError","prime","fill","forceFill","idle","pump","setPressure","error","override","leakageTest","continue", "preempt", "waitIsolate"]
 		self.cmbState = Combobox(values = self.lstStates,textvariable = self.varState)
 		self.cmbState.grid(row=rowC,column = 3)
 		self.btnState = Button(text='Send state',command=self.sendState)
@@ -131,7 +132,17 @@ class ButtonsFrame(Frame):
 		self.grid(row=0,column = 0)
 		self.createWidgets()
 		self.sendCmd = sendCmd
-		
+
+def prompt(incomming):
+	#print( incomming)
+	reply = tkinter.messagebox.askyesno('Prompt', incomming['prompt']['msg'])
+	print("reply:",reply)
+	if (reply):
+		comms.sendPromptReply({'reply':'yes','id':incomming['prompt']['id']})
+	else:
+		comms.sendPromptReply({'reply':'no','id':incomming['prompt']['id']})
+	
+
 def updateUI(comms, app):
 	while (comms.terminate ==False):
 		rigStatus, appStatus = comms.getStatus()
@@ -163,8 +174,14 @@ def updateUI(comms, app):
 			elif(key == 'reply'):
 				app.addReply(incoming['reply'])
 				print("Got reply")
+			elif(key == 'prompt'):
+				print(incoming)
+				prmt_t = threading.Thread(target=prompt,args=(incoming,))
+				prmt_t.start()
+				
+				
 					
-		time.sleep(0.4)
+		time.sleep(0.1)
 		
 	print('TerminateComms init')	
 	comms.terminateComms()
