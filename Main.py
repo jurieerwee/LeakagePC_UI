@@ -28,6 +28,10 @@ class ButtonsFrame(Frame):
 	def sendMode(self,event):
 		print(self.varMode.get())
 		self.sendCmd({'type':'modeCMD','instr':self.varMode.get()})
+		
+	def sendPerc(self,event):
+		print('perc:' + str(self.varPerc.get()))
+		self.sendRigCmd({'type':'setCMD','instr':'setPumpPerc','percentage':self.varPerc.get()})
 	
 	def createWidgets(self):
 		rowC =0
@@ -66,6 +70,15 @@ class ButtonsFrame(Frame):
 		self.varFbStep = StringVar()
 		self.entStep = Entry(state = 'readonly',textvariable = self.varFbStep)
 		self.entStep.grid(row=rowC,column=5)
+		
+		rowC+=1
+		
+		self.lblPerc = Label(text='Pump percentage:')
+		self.lblPerc.grid(row=rowC, column=0)
+		self.varPerc = DoubleVar()
+		self.entPerc = Entry(textvariable = self.varPerc)
+		self.entPerc.grid(row=rowC, column =1)
+		self.entPerc.bind('<FocusOut>',self.sendPerc)
 		
 		rowC+=1
 
@@ -127,11 +140,12 @@ class ButtonsFrame(Frame):
 		self.txtReply.insert(INSERT, json.dumps(msg))
 		self.txtReply.config(state=DISABLED)
 	
-	def __init__(self,sendCmd,master=None):
+	def __init__(self,sendCmd,sendRigCmd,master=None):
 		Frame.__init__(self, master)
 		self.grid(row=0,column = 0)
 		self.createWidgets()
 		self.sendCmd = sendCmd
+		self.sendRigCmd = sendRigCmd
 
 def prompt(incomming):
 	#print( incomming)
@@ -181,19 +195,19 @@ def updateUI(comms, app):
 				
 				
 					
-		time.sleep(0.1)
+		#time.sleep(0.1)
 		
 	print('TerminateComms init')	
 	comms.terminateComms()
 	print('TerminateComms done')	
 	
 
-comms = UIServerComms('10.42.0.77',5001)
+comms = UIServerComms('Jurie-masters',5001)
 
 comms.start()
 		
 root = Tk()
-app = ButtonsFrame(master = root,sendCmd = comms.sendUICmd)
+app = ButtonsFrame(master = root,sendCmd = comms.sendUICmd, sendRigCmd = comms.sendRigCmd)
 
 update = threading.Thread(target=updateUI, args=(comms, app))
 update.start()
