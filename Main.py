@@ -33,6 +33,13 @@ class ButtonsFrame(Frame):
 		print('perc:' + str(self.varPerc.get()))
 		self.sendRigCmd({'type':'setCMD','instr':'setPumpPerc','percentage':self.varPerc.get()})
 	
+	def sendDataDump(self,activate):
+		print('DataDump ' + str(activate))
+		if (activate==True):
+			self.sendRigCmd({'type':'testerCMD','instr':'activateDataDump'})
+		elif(activate==False):
+			self.sendRigCmd({'type':'testerCMD','instr':'deactivateDataDump'})
+			
 	def createWidgets(self):
 		rowC =0
 		self.lblMode = Label(text='Mode:')
@@ -79,6 +86,12 @@ class ButtonsFrame(Frame):
 		self.entPerc = Entry(textvariable = self.varPerc)
 		self.entPerc.grid(row=rowC, column =1)
 		self.entPerc.bind('<FocusOut>',self.sendPerc)
+		
+		self.btnActivateDump = Button(text = "Activate data dump",command = lambda:self.sendDataDump(True))
+		self.btnActivateDump.grid(row=rowC, column=2)
+
+		self.btnActivateDump = Button(text = "Deactivate data dump",command = lambda:self.sendDataDump(False))
+		self.btnActivateDump.grid(row=rowC, column=3)
 		
 		rowC+=1
 
