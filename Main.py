@@ -40,6 +40,10 @@ class ButtonsFrame(Frame):
 		elif(activate==False):
 			self.sendRigCmd({'type':'testerCMD','instr':'deactivateDataDump'})
 			
+	def sendManual(self,instr):
+		print('Send manual ' + instr)
+		self.sendRigCmd({'type':'manualCMD','instr':instr})
+			
 	def createWidgets(self):
 		rowC =0
 		self.lblMode = Label(text='Mode:')
@@ -92,6 +96,27 @@ class ButtonsFrame(Frame):
 
 		self.btnActivateDump = Button(text = "Deactivate data dump",command = lambda:self.sendDataDump(False))
 		self.btnActivateDump.grid(row=rowC, column=3)
+		
+		rowC+=1
+		self.btnStartPump = Button(text = 'startPump',command = lambda:self.sendManual('startPump'))
+		self.btnStartPump.grid(row=rowC,column=0)
+		self.btnStartPump = Button(text = 'stopPump',command = lambda:self.sendManual('stoptPump'))
+		self.btnStartPump.grid(row=rowC,column=1)
+		
+		self.btnStartPump = Button(text = 'openInflow',command = lambda:self.sendManual('openInflowValve'))
+		self.btnStartPump.grid(row=rowC,column=2)
+		self.btnStartPump = Button(text = 'closeInflow',command = lambda:self.sendManual('closeInflowValve'))
+		self.btnStartPump.grid(row=rowC,column=3)
+		
+		self.btnStartPump = Button(text = 'openOut',command = lambda:self.sendManual('openOutValve'))
+		self.btnStartPump.grid(row=rowC,column=4)
+		self.btnStartPump = Button(text = 'closeOut',command = lambda:self.sendManual('closeOutValve'))
+		self.btnStartPump.grid(row=rowC,column=5)
+		
+		self.btnStartPump = Button(text = 'openRelease',command = lambda:self.sendManual('openReleaseValve'))
+		self.btnStartPump.grid(row=rowC,column=6)
+		self.btnStartPump = Button(text = 'closeRelease',command = lambda:self.sendManual('closeReleaseValve'))
+		self.btnStartPump.grid(row=rowC,column=7)
 		
 		rowC+=1
 
@@ -171,6 +196,8 @@ def prompt(incomming):
 	
 
 def updateUI(comms, app):
+	stepStrings = ['start pump', 'start pump','Initial pumprun','Set pressure','Set pressure', 'start settle', 'wait settle','reset counters', 'measuring','Take measure','Send idle', 'Save results']
+	
 	while (comms.terminate ==False):
 		rigStatus, appStatus = comms.getStatus()
 		app.txtAppStatus.config(state=NORMAL)
@@ -184,7 +211,10 @@ def updateUI(comms, app):
 		try:
 			app.varFbMode.set(appStatus['mode'])
 			app.varFbState.set(appStatus['state'])
-			app.varFbStep.set(appStatus['step'])
+			if (appStatus['state']=='leakageTest'):
+				app.varFbStep.set(stepStrings[appStatus['step']-1])
+			else:
+				app.varFbStep.set(appStatus['step'])
 		except:
 			pass
 			#print("App status not according to convention")
