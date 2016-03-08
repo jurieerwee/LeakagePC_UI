@@ -56,7 +56,7 @@ class ButtonsFrame(Frame):
 		self.lblState = Label(text='State:')
 		self.lblState.grid(row=rowC,column = 2)
 		self.varState = StringVar()
-		self.lstStates = ["clearError","prime","fill","forceFill","idle","pump","setPressure","error","override","leakageTest","continue", "preempt", "waitIsolate"]
+		self.lstStates = ["clearError","prime","fill","forceFill","idle","pump","setPressure","error","override","leakageTest","continue", "preempt", "waitIsolate","isolationTest"]
 		self.cmbState = Combobox(values = self.lstStates,textvariable = self.varState)
 		self.cmbState.grid(row=rowC,column = 3)
 		self.btnState = Button(text='Send state',command=self.sendState)
@@ -100,7 +100,7 @@ class ButtonsFrame(Frame):
 		rowC+=1
 		self.btnStartPump = Button(text = 'startPump',command = lambda:self.sendManual('startPump'))
 		self.btnStartPump.grid(row=rowC,column=0)
-		self.btnStartPump = Button(text = 'stopPump',command = lambda:self.sendManual('stoptPump'))
+		self.btnStartPump = Button(text = 'stopPump',command = lambda:self.sendManual('stopPump'))
 		self.btnStartPump.grid(row=rowC,column=1)
 		
 		self.btnStartPump = Button(text = 'openInflow',command = lambda:self.sendManual('openInflowValve'))
@@ -108,9 +108,9 @@ class ButtonsFrame(Frame):
 		self.btnStartPump = Button(text = 'closeInflow',command = lambda:self.sendManual('closeInflowValve'))
 		self.btnStartPump.grid(row=rowC,column=3)
 		
-		self.btnStartPump = Button(text = 'openOut',command = lambda:self.sendManual('openOutValve'))
+		self.btnStartPump = Button(text = 'openOut',command = lambda:self.sendManual('openOutflowValve'))
 		self.btnStartPump.grid(row=rowC,column=4)
-		self.btnStartPump = Button(text = 'closeOut',command = lambda:self.sendManual('closeOutValve'))
+		self.btnStartPump = Button(text = 'closeOut',command = lambda:self.sendManual('closeOutflowValve'))
 		self.btnStartPump.grid(row=rowC,column=5)
 		
 		self.btnStartPump = Button(text = 'openRelease',command = lambda:self.sendManual('openReleaseValve'))
@@ -211,7 +211,7 @@ def updateUI(comms, app):
 		try:
 			app.varFbMode.set(appStatus['mode'])
 			app.varFbState.set(appStatus['state'])
-			if (appStatus['state']=='leakageTest'):
+			if (appStatus['state']=='LEAKAGE_TEST'):
 				app.varFbStep.set(stepStrings[appStatus['step']-1])
 			else:
 				app.varFbStep.set(appStatus['step'])
@@ -245,7 +245,7 @@ def updateUI(comms, app):
 	print('TerminateComms done')	
 	
 
-comms = UIServerComms('Jurie-masters',5001)
+comms = UIServerComms('jurie-masters.local',5001)
 
 comms.start()
 		
