@@ -99,24 +99,24 @@ class ButtonsFrame(Frame):
 		
 		rowC+=1
 		self.btnStartPump = Button(text = 'startPump',command = lambda:self.sendManual('startPump'))
-		self.btnStartPump.grid(row=rowC,column=0)
+		self.btnStartPump.grid(row=rowC,column=0,sticky='we')
 		self.btnStartPump = Button(text = 'stopPump',command = lambda:self.sendManual('stopPump'))
-		self.btnStartPump.grid(row=rowC,column=1)
+		self.btnStartPump.grid(row=rowC,column=1,sticky='we')
 		
 		self.btnStartPump = Button(text = 'openInflow',command = lambda:self.sendManual('openInflowValve'))
-		self.btnStartPump.grid(row=rowC,column=2)
+		self.btnStartPump.grid(row=rowC,column=2,sticky='we')
 		self.btnStartPump = Button(text = 'closeInflow',command = lambda:self.sendManual('closeInflowValve'))
-		self.btnStartPump.grid(row=rowC,column=3)
+		self.btnStartPump.grid(row=rowC,column=3,sticky='we')
 		
 		self.btnStartPump = Button(text = 'openOut',command = lambda:self.sendManual('openOutflowValve'))
-		self.btnStartPump.grid(row=rowC,column=4)
+		self.btnStartPump.grid(row=rowC,column=4,sticky='we')
 		self.btnStartPump = Button(text = 'closeOut',command = lambda:self.sendManual('closeOutflowValve'))
-		self.btnStartPump.grid(row=rowC,column=5)
+		self.btnStartPump.grid(row=rowC,column=5,sticky='we')
 		
 		self.btnStartPump = Button(text = 'openRelease',command = lambda:self.sendManual('openReleaseValve'))
-		self.btnStartPump.grid(row=rowC,column=6)
+		self.btnStartPump.grid(row=rowC,column=6,sticky='we')
 		self.btnStartPump = Button(text = 'closeRelease',command = lambda:self.sendManual('closeReleaseValve'))
-		self.btnStartPump.grid(row=rowC,column=7)
+		self.btnStartPump.grid(row=rowC,column=7,sticky='we')
 		
 		rowC+=1
 
@@ -124,16 +124,16 @@ class ButtonsFrame(Frame):
 		self.lblReply.grid(row=rowC,column=0,sticky='w')
 		rowC+=1
 		self.txtReply = Text(wrap=WORD, height = 1)
-		self.txtReply.grid(row=rowC,column = 0,columnspan=4)
+		self.txtReply.grid(row=rowC,column = 0,columnspan=7)
 
 		rowC+=1
 		self.lblWarning = Label(text='Warnings:')
 		self.lblWarning.grid(row=rowC,column=0,sticky='w')
 		self.scrlWarning = Scrollbar()
 		rowC+=1
-		self.scrlWarning.grid(row=rowC,column = 4,sticky = 'nsw')
+		self.scrlWarning.grid(row=rowC,column = 7,sticky = 'nsw')
 		self.txtWarning = Text(wrap=WORD, height = 5, state=DISABLED)
-		self.txtWarning.grid(row=rowC,column = 0,columnspan=4)
+		self.txtWarning.grid(row=rowC,column = 0,columnspan=7,sticky='we')
 		self.txtWarning['yscrollcommand'] = self.scrlWarning.set
 		self.scrlWarning['command'] = self.txtWarning.yview
 		
@@ -142,9 +142,9 @@ class ButtonsFrame(Frame):
 		self.lblError.grid(row=rowC,column=0,sticky='w')
 		self.scrlError = Scrollbar()
 		rowC+=1
-		self.scrlError.grid(row=rowC,column = 4,sticky = 'nsw')
+		self.scrlError.grid(row=rowC,column = 7,sticky = 'nsw')
 		self.txtError = Text(wrap=WORD, height = 5, state=DISABLED)
-		self.txtError.grid(row=rowC,column = 0,columnspan=4)
+		self.txtError.grid(row=rowC,column = 0,columnspan=7,sticky='we')
 		self.txtError['yscrollcommand'] = self.scrlError.set
 		self.scrlError['command'] = self.txtError.yview
 		
@@ -153,14 +153,16 @@ class ButtonsFrame(Frame):
 		self.lblRigStatus.grid(row=rowC,column=0,sticky='w')
 		rowC+=1
 		self.txtRigStatus = Text(wrap=WORD, height = 30, width =40, state=DISABLED)
-		self.txtRigStatus.grid(row=rowC,column = 0,columnspan=2)
+		self.txtRigStatus.grid(row=rowC,column = 0,columnspan=3,sticky='w')
 		
 		rowC-=1
 		self.lblAppStatus = Label(text='Main status:')
 		self.lblAppStatus.grid(row=rowC,column=3,sticky='w')
 		rowC+=1
+		self.scrlAppStatus = Scrollbar()
+		self.scrlAppStatus.grid(row=rowC,column=7,sticky='wns')
 		self.txtAppStatus = Text(wrap=WORD, height = 30, width =40, state=DISABLED)
-		self.txtAppStatus.grid(row=rowC,column = 3,columnspan=2)
+		self.txtAppStatus.grid(row=rowC,column = 3,columnspan=4,sticky='e')
 		
 	def addWarningMsg(self,msg):
 		self.txtWarning.config(state=NORMAL)
@@ -247,7 +249,7 @@ def updateUI(comms, app):
 
 comms = UIServerComms('jurie-masters.local',5001)
 
-comms.start()
+#comms.start()
 		
 root = Tk()
 app = ButtonsFrame(master = root,sendCmd = comms.sendUICmd, sendRigCmd = comms.sendRigCmd)
