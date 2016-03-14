@@ -25,6 +25,9 @@ class ButtonsFrame(Frame):
 		print(self.varState.get())
 		self.sendCmd({'type':'stateCMD','instr':self.varState.get()})
 	
+	def sendEmergency(self):
+		self.sendCmd({'type':'stateCMD','instr':'error'})
+	
 	def sendMode(self,event):
 		print(self.varMode.get())
 		self.sendCmd({'type':'modeCMD','instr':self.varMode.get()})
@@ -56,11 +59,14 @@ class ButtonsFrame(Frame):
 		self.lblState = Label(text='State:')
 		self.lblState.grid(row=rowC,column = 2)
 		self.varState = StringVar()
-		self.lstStates = ["clearError","prime","fill","forceFill","idle","pump","setPressure","error","override","leakageTest","continue", "preempt", "waitIsolate","isolationTest"]
+		self.lstStates = ["clearError","prime","fill","forceFill","idle","pump","setPressure","error","override","leakageTest","continue", "preempt", "waitIsolate","isolationTest", "preempt","terminate"]
 		self.cmbState = Combobox(values = self.lstStates,textvariable = self.varState)
 		self.cmbState.grid(row=rowC,column = 3)
 		self.btnState = Button(text='Send state',command=self.sendState)
 		self.btnState.grid(row=rowC,column = 4)
+		
+		self.btnEmer = Button(text= "EMERGENCY",command=self.sendEmergency,bg='red')
+		self.btnEmer.grid(row=rowC,column = 6, columnspan=2, rowspan=2,sticky='nsew')
 		
 		rowC +=1
 		
