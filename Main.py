@@ -253,9 +253,9 @@ def updateUI(comms, app):
 	print('TerminateComms done')	
 	
 
-comms = UIServerComms('jurie-masters.local',5001)
+comms = UIServerComms('',5001)
 
-#comms.start()
+comms.start()
 		
 root = Tk()
 app = ButtonsFrame(master = root,sendCmd = comms.sendUICmd, sendRigCmd = comms.sendRigCmd)
